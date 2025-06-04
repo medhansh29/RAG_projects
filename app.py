@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import chromadb
 from openai import OpenAI
 from chromadb.utils import embedding_functions
+import time
 
 # Load environment variables from .env file
 load_dotenv()
@@ -78,13 +79,13 @@ for doc in documents:
 def get_openai_embedding(text):
     response = client.embeddings.create(input=text, model="text-embedding-3-small")
     embedding = response.data[0].embedding
-    print("==== Generating embeddings... ====")
+    #print("==== Generating embeddings... ====")
     return embedding
 
 
 # Generate embeddings for the document chunks
+print("==== Generating embeddings... ====")
 for doc in chunked_documents:
-    #print("==== Generating embeddings... ====")
     doc["embedding"] = get_openai_embedding(doc["text"])
 
 # print(doc["embedding"])
@@ -143,8 +144,11 @@ def generate_response(question, relevant_chunks):
 # Example query
 # query_documents("tell me about AI replacing TV writers strike.")
 # Example query and response generation
+start_time = time.time()
 question = "tell me about databricks"
 relevant_chunks = query_documents(question)
 answer = generate_response(question, relevant_chunks)
+elapsed_time = time.time() - start_time
 
 print(answer)
+print(f"⏱️ Query processed in {elapsed_time:.4f} seconds.\n")

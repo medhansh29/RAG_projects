@@ -1,4 +1,4 @@
-import os
+import time
 from sentence_transformers import SentenceTransformer
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
@@ -29,6 +29,8 @@ try:
 
     query = "a drama about the courtroom"
 
+    start_time = time.time()
+
     results = collection.aggregate([
         {"$vectorSearch":{
             "queryVector": generate_embedding(query),
@@ -38,9 +40,14 @@ try:
             "index": "PlotSemanticSearch"
         }}
     ])
+    
 
     for document in results:
         print(f'Movie Name: {document["title"]},\nMovie Plot: {document["fullplot"]}\n')
+
+    elapsed_time = time.time() - start_time
+
+    print(f"⏲️ Total Time: {elapsed_time:.4f} seconds")
 
 
 finally:
